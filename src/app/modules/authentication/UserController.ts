@@ -12,7 +12,7 @@ import {
 } from "routing-controllers";
 import {Response} from "express";
 import {validateOrReject} from "class-validator";
-import {SignUp} from "../../../core/write/usecases/authentication/Signup";
+import {SignUp} from "../../../core/write/usecases/authentication/SignUp";
 import {SignupCommand} from "./commands/SignupCommand";
 import {Identifiers} from "../../../core/Identifiers";
 import {IdentityGateway} from "../../../core/write/domain/gateway/IdentityGateway";
