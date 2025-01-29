@@ -1,38 +1,42 @@
 import {PostgresConnectionOptions} from "typeorm/driver/postgres/PostgresConnectionOptions";
-import sgMail from "@sendgrid/mail";
+import { parse } from 'pg-connection-string';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 export const jwtConfig = {
     secret: process.env.JWT_SECRET,
     config: {
-        expiresIn: process.env.JWT_DURATION,
+        expiresIn: process.env.JWT_DURATION
     },
-};
-
-export const dataSourceConfig: PostgresConnectionOptions = {
-    type: "postgres",
-    host: process.env.DB_HOST,
-    port: +process.env.DB_PORT,
-    username: process.env.DB_USERNAME,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    logging: process.env.DB_LOGGING === "true",
-    synchronize: true,
-    ssl:
-        process.env.DB_NAME === "postgres"
-            ? false
-            : {
-                rejectUnauthorized: false,
-            },
-};
-
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-
-export interface SendgridConfig {
-    sgMail: typeof sgMail;
-    from: string;
+}
+function requiredEnv(variable: string, defaultValue?: string): string {
+    const value = process.env[variable];
+    if (value === undefined && defaultValue === undefined) {
+        throw new Error(`Environment variable ${variable} is required but not set.`);
+    }
+    return value || defaultValue!;
 }
 
-export const sendgridConfig: SendgridConfig = {
-    sgMail,
-    from: process.env.SENDGRID_EMAIL_FROM,
+export const dingConfiguration = {
+    secretToken: process.env.DING_API_KEY,
+    url: process.env.DING_URL,
+    customerUUID: process.env.DING_CUSTOMER_UUID,
+    bypass: process.env.SMS_OTP_BYPASS === "true",
+    otpCodeBypass: process.env.SMS_CODE_OTP_BYPASS
+}
+const dbConfig = parse(requiredEnv('DATABASE_URL'));
+export const dataSourceConfig: PostgresConnectionOptions = {
+    type: "postgres",
+    host: dbConfig.host || "localhost",
+    port: parseInt(dbConfig.port || "5432", 10),
+    username: dbConfig.user || "postgres",
+    password: dbConfig.password || "password",
+    database: dbConfig.database || "postgres",
+    logging: process.env.DB_LOGGING === "true",
+    synchronize: process.env.NODE_ENV !== "production",
 };
+
+
+
+export const contentCount = +process.env.CONTENT_COUNT ? +process.env.CONTENT_COUNT : 1;
