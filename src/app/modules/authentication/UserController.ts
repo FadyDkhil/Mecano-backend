@@ -34,6 +34,7 @@ import { BecomeMechanicCommand } from "./commands/BecomeMechanicCommand";
 import { BecomeMechanic } from "../../../core/write/usecases/mechanic/BecomeMechanic";
 import { ApproveMechanicCommand } from "./commands/ApproveMechanicCommand";
 import { UpdateMechanicStatus } from "../../../core/write/usecases/mechanic/UpdateMechanicStatus";
+import { UnAuthorizedAction } from "../../config/models/UnAuthorizedAction";
 
 @injectable()
 @JsonController("/user")
@@ -192,13 +193,13 @@ export class UserController {
     ) {
         const body = ApproveMechanicCommand.setProperties(cmd);
         await validateOrReject(body);
-        // const isAuthorized =  await this._updateDriverStatus.canExecute(
-        //     req.identity
-        // );
+        const isAuthorized =  await this._updateMechanicStatus.canExecute(
+            req.identity
+        );
 
-        // if (!isAuthorized) {
-        //     return UnAuthorizedAction(res);
-        // }
+        if (!isAuthorized) {
+            return UnAuthorizedAction(res);
+        }
 
         const result = await this._updateMechanicStatus.execute({
             userId: user_id,
