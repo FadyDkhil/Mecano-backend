@@ -1,37 +1,43 @@
 import 'reflect-metadata';
 import * as dotenv from 'dotenv';
-dotenv.config();
+
 import cors from 'cors';
 import express from 'express';
 import { configureExpress } from './app/config/express';
-import * as v8 from 'node:v8';
 
-const maxHeap = v8.getHeapStatistics().heap_size_limit;
-function getPercentOfMaxHeapInUse() {
-    return v8.getHeapStatistics().used_heap_size / maxHeap;
-}
-
-
-if (getPercentOfMaxHeapInUse() > 0.8) {
-    console.log("OVER LIMIT")
-}
-
+dotenv.config();
+console.log("Database URL:", process.env.DATABASE_URL);
 const PORT = process.env.PORT || 9000;
 
 const app = express();
-app.use(cors());
+
+app.use(cors({
+    origin: (origin, callback) => {
+        if (!origin || origin === 'http://localhost:9000') {
+            callback(null, true); 
+        } else {
+            callback(null, true); 
+        }
+    },
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+}));
+
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 const container = configureExpress(app);
-container.catch((error) => {
-    console.error('Error configuring express', error);
-    process.exit(1);
-});
 
 app.listen(PORT, async () => {
     console.log(`Server is running on port ${PORT}`);
     try {
+        // await container.runSeeds();
         console.log('Seeding completed');
     } catch (error) {
         console.error('Seeding failed', error);
     }
 });
+
+export default app;
