@@ -13,6 +13,7 @@ import { ChooseStatus } from "../../../core/write/usecases/mechanic/ChooseStatus
 import { GetMechanicRequests } from "../../../core/read/queries/GetMechanicRequests";
 import { GetUsers } from "../../../core/read/queries/GetUsers";
 import { GetMyRequests } from "../../../core/read/queries/GetMyRequests";
+import { UnAuthorizedAction } from "../../config/models/UnAuthorizedAction";
 
 @injectable()
 @JsonController("/mechanic")
@@ -64,7 +65,7 @@ export class MechanicController {
     ) {
         const body = ChooseStatusCommand.setProperties(cmd);
         await validateOrReject(body);
-        // const isAuthorized =  await this._updateDriverStatus.canExecute(
+        // const isAuthorized =  await this._chooseStatus.canExecute(
         //     req.identity
         // );
 

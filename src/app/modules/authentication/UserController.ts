@@ -193,13 +193,13 @@ export class UserController {
     ) {
         const body = ApproveMechanicCommand.setProperties(cmd);
         await validateOrReject(body);
-        const isAuthorized =  await this._updateMechanicStatus.canExecute(
-            req.identity
-        );
+        // const isAuthorized =  await this._updateMechanicStatus.canExecute(
+        //     req.identity
+        // );
 
-        if (!isAuthorized) {
-            return UnAuthorizedAction(res);
-        }
+        // if (!isAuthorized) {
+        //     return UnAuthorizedAction(res);
+        // }
 
         const result = await this._updateMechanicStatus.execute({
             userId: user_id,
